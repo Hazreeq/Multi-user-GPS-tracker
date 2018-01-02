@@ -1,0 +1,360 @@
+<ion-view title="" id="page3">
+  <ion-content padding="true" style="background: url(img/3HTsXxP0Q5qP25Bx6tzx_5337f7fab2996_thumb900.jpg) no-repeat center;background-size:cover;" class="has-header">
+    <h4 id="page3-heading3" style="color:#FDFDFD;text-align:center;">Current Active Users</h4>
+	 <html>
+<title>Report List</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+<script src='https://code.jquery.com/jquery-1.11.0.min.js'></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.7.0/lodash.min.js"></script>
+ <script src='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.css' rel='stylesheet' />
+<script src="https://cdn.firebase.com/js/client/2.2.3/firebase.js"></script>
+<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.min.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.mapbox.css' rel='stylesheet' />
+<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/css/font-awesome.min.css' rel='stylesheet' />
+<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/leaflet.markercluster.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.css' rel='stylesheet' />
+<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.Default.css' rel='stylesheet' />
+<head>
+<style>
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even){background-color: #f2f2f2}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+</style>
+<style type="text/css">
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/4.5.1/firebase.js"></script>
+  <script src="js/my_js.js"></script>
+  <table id="report" border=1>
+    <tr><th><center>User</center><th><center>Deployment Info</center></tr>
+  <script>
+
+//--------------------------------------Track User--------------------------------------//
+var marker = new Firebase('https://multiuser-gps-tracker.firebaseio.com/maps');
+
+var markers = {};
+
+function addPoint(uuid, position) {
+    var typeDisaster = position.coords.typeofdisaster;
+    var latitude = position.coords.latitude;
+    var longitude = position.coords.longitude;
+    var name = position.coords.name;
+    var age = position.coords.age;
+    var contact = position.coords.contact; 
+    var casualties = position.coords.casualties;
+    var medication = position.coords.medication;
+    var urgentneed = position.coords.urgentneed;
+    var date = position.coords.date;
+    var role = position.coords.role;
+
+    if(role==1){
+      if(uuid==myUuid){
+          document.getElementById("report").innerHTML+= "<tr><td><center><img  src='img/marker1.png' height=35 width=35/><br>You</center></td><td>Rescue Operation<br><button class='view' lat="+ latitude + " lon="+ longitude + " value="+ uuid + ">Track</button><br></tr>";
+      }
+      else
+      {document.getElementById("report").innerHTML+= "<tr><td><center><img  src='img/rescue.png' height=35 width=35/></center></td><td>Rescue Operation<br><button class='view' lat="+ latitude + " lon="+ longitude + " value="+ uuid + ">Track</button><br></tr>";}
+    }
+    else{
+      if(uuid==myUuid){
+          document.getElementById("report").innerHTML+= "<tr><td><center><img  src=img/marker1.png height=35 width=35/><br>You</center></td><td><b>Type of Disaster: </b>"+typeDisaster +"</b><br><b>Name: </b>"+ name + "<br><b>Age: </b>" + age +"<br><b>Contact Number: </b>" + contact +"<br><b>How many people injured? : </b>" + casualties + "<br><b>Need of medication: </b>" + medication + "<br><b>Urgent Need: </b>" + urgentneed + "<br><b>Date: </b>" + date + "<br><button class='view' lat="+ latitude + " lon="+ longitude + " value="+ uuid + ">Track</button><br></tr>";
+      }
+      else{
+        document.getElementById("report").innerHTML+= "<tr><td><center><img  src=img/marker.png height=35 width=35/></center></td><td><b>Type of Disaster: </b>"+typeDisaster +"<br><b>Name: </b>"+ name + "<br><b>Age: </b>" + age +"<br><b>Contact Number: </b>" + contact +"<br><b>How many people injured? : </b>" + casualties + "<br><b>Need of medication: </b>" + medication + "<br><b>Urgent Need: </b>" + urgentneed + "<br><b>Date: </b>" + date + "<br><button class='view' lat="+ latitude + " lon="+ longitude + " value="+ uuid + ">Track</button><br></tr>";
+      }
+      
+    }
+    
+}
+
+function removePoint(uuid) {
+  map.removeLayer(markers[uuid])
+}
+
+function updatePoint(uuid, position) {
+  var marker = markers[uuid]
+  marker.setLatLng([position.coords.latitude, position.coords.longitude])
+}
+
+function putPoint(uuid, position) {
+  if (markers[uuid])
+    updatePoint(uuid, position)
+  else
+    addPoint(uuid, position)
+}
+
+//retrieve current location from firebase
+marker.on('child_added', function(childSnapshot) {
+  var uuid = childSnapshot.key()
+  var position = childSnapshot.val()
+
+  addPoint(uuid, position)
+})
+
+marker.on('child_changed', function(childSnapshot) {
+  var uuid = childSnapshot.key()
+  var position = childSnapshot.val()
+
+  document.getElementById("report").innerHTML+="";
+  //putPoint(uuid, position)
+})
+
+marker.on('child_removed', function(oldChildSnapshot) {
+  var uuid = oldChildSnapshot.key()
+
+  document.getElementById("report").innerHTML+="";
+  //removePoint(uuid)
+})
+
+// Remove old markers
+setInterval(function() {
+  marker.limitToFirst(100).once('value', function(snap) {
+    var now = Math.floor(Date.now() / 1000)
+    //console.log(now);
+    snap.forEach(function(childSnapshot) {
+      var uuid = childSnapshot.key()
+
+       if (uuid === myUuid) return
+
+      if (childSnapshot.val().timestamp < now - 100 ) {
+        document.getElementById("report").innerHTML+="";
+      }
+    })
+  })
+}, 5000);
+
+//--------------------------------------Track User--------------------------------------//
+
+$(document).on('click', '.view', function() {
+    
+    var clicked = $(this).val();
+    var lat = $(this).attr('lat');
+    var lon = $(this).attr('lon');
+    
+    //alert(lat + lon);
+    var delTable = document.getElementById("report");
+          delTable.innerHTML="";
+
+    document.getElementById('display').id = 'map'; 
+    L.mapbox.accessToken = 'pk.eyJ1IjoiaGF6cmVlcSIsImEiOiJjajkydGUzbW0wc203MzBxYnM4cGFia2tuIn0.bIq7eMZU72PzPyoLkd1JYA';
+
+    var map = L.mapbox.map('map', 'mapbox.streets', {
+      zoomControl: true,
+      attributionControl: false,
+      tileLayer: {
+        maxNativeZoom: 19
+      }
+    }).setView([lat, lon], 100)
+    L.control.locate().addTo(map);
+
+    //function messaging
+$(document).on('click', '.message', function() {
+    var clicked = $(this).val();
+    //var no = $(this).attr('no');
+
+    message = document.getElementById("mes").value;
+    if(message==""){
+      alert('please enter message!');
+      return false;
+    }
+    else{
+        var refMessage = database.ref('location/' + clicked + '/message');
+
+        refMessage.push({
+          message: message,
+          visit: 0
+        });
+        alert('Message has been sent to this victim!');
+    }
+
+});
+//function messaging
+
+var marker = new Firebase('https://multiuser-gps-tracker.firebaseio.com/maps/');
+var markers = {};
+
+firebase.auth().onAuthStateChanged(firebaseUser=>{
+      if(firebaseUser){
+         navigator.geolocation.watchPosition(function(position) {
+          enableHighAccuracy: true,
+            marker.child(myUuid).set({
+              coords: {
+                role: 1,
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              },
+              timestamp: Math.floor(Date.now() / 1000)
+            })
+          }
+          );
+      }
+      else{
+         navigator.geolocation.watchPosition(function(position) {
+          enableHighAccuracy: true,
+            marker.child(myUuid).set({
+              coords: {
+                role:0,
+                name: displayName,
+                age: displayAge,
+                contact: displayContact,
+                urgentneed: displayuNeed,
+                casualties: displayCas,
+                medication: displaynMedic,
+                typeofdisaster: displayType,
+                date: displayDate,
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              },
+              timestamp: Math.floor(Date.now() / 1000)
+            })
+          }
+          );
+      }
+  });
+
+function addPoint(uuid, position) {
+  var myIcon = L.icon({
+  iconUrl: (uuid == myUuid ? 'img/marker1.png' : position.coords.role == 1 ? 'img/rescue.png': 'img/marker.png'),
+  iconSize: [25, 25], 
+  iconAnchor: [10, 10],
+});
+
+  var marker = L.marker([position.coords.latitude, position.coords.longitude], {
+    icon: myIcon
+  })
+  .bindPopup(uuid == myUuid ? "You are here" : position.coords.role == 1 ? 'Rescue Operation' : 
+
+    '<b>Type of disaster: </b>'+ position.coords.typeofdisaster + ' <br>' +
+    '<b>Name:  </b>' + position.coords.name + ' <br>' + 
+    '<b>Age:  </b>' + position.coords.age + '<br>' +
+    '<b>Contact Number: </b>' + position.coords.contact + '<br>' +
+    '<b>Is there any casualties? : </b>' + position.coords.casualties + '<br>' +
+    '<b>Need of Medication: </b>' + position.coords.medication + '<br>' +
+    '<b>Urgent Need: </b>' + position.coords.urgentneed + '<br>' +
+    '<b>Date: </b>' + position.coords.date + '<br>')
+  .addTo(map)
+
+  markers[uuid] = marker;
+  map.fitBounds(Object.keys(markers).map(function(uuid) {
+    return markers[uuid].getLatLng()
+  }))
+}
+
+function removePoint(uuid) {
+  map.removeLayer(markers[uuid])
+}
+
+function updatePoint(uuid, position) {
+  var marker = markers[uuid]
+  marker.setLatLng([position.coords.latitude, position.coords.longitude])
+}
+
+function putPoint(uuid, position) {
+  if (markers[uuid])
+    updatePoint(uuid, position)
+  else
+    addPoint(uuid, position)
+}
+
+//retrieve current location from firebase
+marker.on('child_added', function(childSnapshot) {
+  var uuid = childSnapshot.key()
+  var position = childSnapshot.val()
+
+  addPoint(uuid, position)
+})
+
+marker.on('child_changed', function(childSnapshot) {
+  var uuid = childSnapshot.key()
+  var position = childSnapshot.val()
+
+  putPoint(uuid, position)
+})
+
+marker.on('child_removed', function(oldChildSnapshot) {
+  var uuid = oldChildSnapshot.key()
+
+  removePoint(uuid)
+})
+
+$(document).on('click', '.messageVictim', function() {
+    var clicked = $(this).val();
+    //var no = $(this).attr('no');
+
+    message = document.getElementById("mes").value;
+   /* alert(message);
+    alert(clicked);
+    alert(myUuid);*/
+    if(message==""){
+      alert('Please enter message!');
+      document.getElementById("mes").focus();
+      return false;
+    }
+    else{
+        var refMessage = database.ref('location/' + clicked + '/message');
+
+        refMessage.push({
+          message: message,
+          role: 1,
+          visit: 0
+        });
+        alert('Message has been sent to this victim!');
+        document.getElementById("mes").value="";
+    }
+
+});
+
+
+// Remove old markers
+setInterval(function() {
+  marker.limitToFirst(100).once('value', function(snap) {
+    var now = Math.floor(Date.now() / 1000)
+    //console.log(now);
+    snap.forEach(function(childSnapshot) {
+      var uuid = childSnapshot.key()
+
+       if (uuid === myUuid) return
+
+      if (childSnapshot.val().timestamp < now - 100 ) {
+        marker.child(uuid).set(null)
+      }
+    })
+  })
+}, 5000);
+
+
+});
+  </script>
+  </table>
+</head>
+<body>
+  <div id="display"></div>
+  
+</body>
+</html>
+  </ion-content>
+</ion-view>
