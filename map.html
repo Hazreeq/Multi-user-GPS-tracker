@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Multiuser GPS Tracker App</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link href="https://api.tiles.mapbox.com/mapbox.js/v2.1.6/mapbox.css" rel="stylesheet">
+  <link href="https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css" rel="stylesheet">
+<style>
+    #fit {
+        display: block;
+        position: relative;
+        margin: 0px auto;
+        width: 50%;
+        height: 40px;
+        padding: 10px;
+        border: none;
+        border-radius: 3px;
+        font-size: 12px;
+        text-align: center;
+        color: #fff;
+        background: #ee8a65;
+    }
+</style>
+  <style type="text/css">
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+<button onclick="getLocation()" id="fit">Return to Homepage</button>
+  <script src="https://api.tiles.mapbox.com/mapbox.js/v2.1.6/mapbox.js"></script>
+  <script src="https://cdn.firebase.com/js/client/2.2.3/firebase.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.7.0/lodash.min.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
+  <script src="https://www.gstatic.com/firebasejs/4.3.0/firebase.js"></script>
+  <script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyDXq4T5EfLm2Wche_1AF_MaM9siqcPknp4",
+    authDomain: "multiuser-gps-tracker.firebaseapp.com",
+    databaseURL: "https://multiuser-gps-tracker.firebaseio.com",
+    projectId: "multiuser-gps-tracker",
+    storageBucket: "multiuser-gps-tracker.appspot.com",
+    messagingSenderId: "664804162540"
+  };
+  firebase.initializeApp(config);
+</script>
+<script>
+function getLocation() {
+window.location.href = "index.html";
+}
+/*
+
+  // store current location with information regarding disaster into firebase
+    function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else { 
+         window.alert("Geolocation is not supported by this browser.");
+    }
+  }
+
+    function showPosition(position){
+      
+      lat = position.coords.latitude;
+      lon = position.coords.longitude;
+
+      var database = firebase.database();
+
+      var ref = database.ref('location');
+
+      var data = {
+        latitude: lat,
+        longitude: lon
+      }
+      ref.push(data);
+    }
+*/
+</script>
+  <script src="config.dist.js"></script>
+  <script src="mapapp.js"></script>
+</body>
+</html>
